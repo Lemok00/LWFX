@@ -42,7 +42,7 @@ input_x = content_x.clone()
 
 STYLE_WEIGHT = 1000
 CONTENT_WEIGHT = 1
-MAX_EPOCH = 1000
+MAX_EPOCH = 300
 PRINT_EPOCH = 50
 
 '''

@@ -59,8 +59,9 @@ def get_style_model_and_losses(style_img, content_img,
 
         if isinstance(layer, nn.MaxPool2d):
             name = 'pool_' + str(i)
-            avgpool = nn.AvgPool2d(kernel_size=layer.kernel_size,
-                                   stride=layer.stride, padding=layer.padding)
-            model.add_module(name, avgpool)
+            model.add_module(name, layer)
+            # avgpool = nn.AvgPool2d(kernel_size=layer.kernel_size,
+            #                       stride=layer.stride, padding=layer.padding)
+            # model.add_module(name, avgpool)
 
     return model, style_losses, content_losses
