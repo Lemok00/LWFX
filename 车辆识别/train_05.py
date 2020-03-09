@@ -12,24 +12,28 @@ from torch.utils.data import DataLoader, random_split
 from mytime import time_change
 import time
 
-from torchvision.models import Inception3
+from torchvision.models import vgg16
 from torchvision.transforms import transforms
 from torchvision.datasets import ImageFolder
 
 if __name__ == '__main__':
     TRAIN_DATA_PATH = 'dataset/newtrain/'
     TRAIN_LABEL_PATH = 'dataset/train.csv'
-    TRAIN_DATA_RATIO = 0.8
-    LEARNING_RATE = 5e-5
-    EPOCHS = 1000
-    PRINT_EPOCH = 5
-    VALID_EPOCH = 20
-    SAVE_EPOCH = 100
+    TRAIN_DATA_RATIO = 0.95
+    LEARNING_RATE = 1e-4
+    EPOCHS = 100
+    PRINT_EPOCH = 1
+    VALID_EPOCH = 10
+    SAVE_EPOCH = 10
+    DOWNLR_EPOCH = 20
+    BATCH_SIZE = 16
 
     # set transformer
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     transform = transforms.Compose([transforms.Resize((320, 480)), transforms.RandomCrop((300, 440)),
                                     transforms.RandomHorizontalFlip(),
+                                    transforms.ColorJitter(brightness=0.5, contrast=0, saturation=0, hue=0),
+                                    transforms.ColorJitter(brightness=0, contrast=0.5, saturation=0, hue=0),
                                     transforms.ToTensor(), normalize])
 
     full_dataset = ImageFolder(root=TRAIN_DATA_PATH, transform=transform)
@@ -39,12 +43,11 @@ if __name__ == '__main__':
     train_dataset, vaild_dataset = random_split(full_dataset, [train_size, vaild_size])
 
     # set dataloader
-    train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
-    valid_loader = DataLoader(dataset=vaild_dataset, batch_size=32, shuffle=True)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    valid_loader = DataLoader(dataset=vaild_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     # init model
-    # model = CarDetectNetwork()
-    model = nn.Sequential(Inception3(num_classes=3, aux_logits=False), nn.Softmax())
+    model = nn.Sequential(vgg16(pretrained=True),nn.Linear(1000, 3), nn.Softmax())
     model.train()
     model.cuda()
 
@@ -116,4 +119,9 @@ if __name__ == '__main__':
 
         # save_model
         if epoch_idx % SAVE_EPOCH == 0:
-            torch.save(model.state_dict(), 'model/0308_inception_{}.pth'.format(epoch_idx))
+            torch.save(model.state_dict(), 'model/0309_vgg_{}.pth'.format(epoch_idx))
+
+        #
+        if epoch_idx % DOWNLR_EPOCH == 0:
+            LEARNING_RATE = LEARNING_RATE / 10
+            optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)

@@ -17,5 +17,5 @@ imgs = paths.list_images('dataset/train/')
 for img in imgs:
     img_num = int(img.split("/")[-1].split('.')[0])
     label_num = labels['label'][img_num]
-    img = Image.open(img).resize((300, 300))
+    img = Image.open(img)
     img.save('dataset/newtrain/%d/%04d.png' % (label_num, img_num))

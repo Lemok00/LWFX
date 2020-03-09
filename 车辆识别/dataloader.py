@@ -41,7 +41,7 @@ class TestDataFolder(Dataset):
 
     def __getitem__(self, index):
         path = self.files[index % len(self.files)]
-        img = np.array(Image.open(path).resize((300, 300)))
+        img = np.array(Image.open(path).resize((440, 300)))
         # (256,256,3) -> (3,256,256)
         img = np.transpose(img, (2, 0, 1))
         img = torch.from_numpy(img).float() / 255.0
