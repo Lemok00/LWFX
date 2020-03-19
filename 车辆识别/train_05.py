@@ -20,7 +20,7 @@ if __name__ == '__main__':
     TRAIN_DATA_PATH = 'dataset/newtrain/'
     TRAIN_LABEL_PATH = 'dataset/train.csv'
     TRAIN_DATA_RATIO = 0.95
-    LEARNING_RATE = 1e-4
+    LEARNING_RATE = 1e-5
     EPOCHS = 100
     PRINT_EPOCH = 1
     VALID_EPOCH = 10

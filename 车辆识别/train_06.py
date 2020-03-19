@@ -1,7 +1,7 @@
 import os
 import sys
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import numpy as np
 import torch
@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, random_split
 from mytime import time_change
 import time
 
-from torchvision.models import squeezenet1_0
+from torchvision.models import densenet201
 from torchvision.transforms import transforms
 from torchvision.datasets import ImageFolder
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     TRAIN_DATA_PATH = 'dataset/newtrain/'
     TRAIN_LABEL_PATH = 'dataset/train.csv'
     TRAIN_DATA_RATIO = 0.95
-    LEARNING_RATE = 1e-5
+    LEARNING_RATE = 1e-4
     EPOCHS = 100
     PRINT_EPOCH = 1
     VALID_EPOCH = 10
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     valid_loader = DataLoader(dataset=vaild_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     # init model
-    model = nn.Sequential(squeezenet1_0(pretrained=True),nn.Linear(1000, 3), nn.Softmax())
+    model = nn.Sequential(densenet201(pretrained=True),nn.Linear(1000, 3), nn.Softmax())
     model.train()
     model.cuda()
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
         # save_model
         if epoch_idx % SAVE_EPOCH == 0:
-            torch.save(model.state_dict(), 'model/0309_squeezenet_{}.pth'.format(epoch_idx))
+            torch.save(model.state_dict(), 'model/0310_densenet201_{}.pth'.format(epoch_idx))
 
         #
         if epoch_idx % DOWNLR_EPOCH == 0:

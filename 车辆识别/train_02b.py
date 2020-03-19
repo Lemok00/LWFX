@@ -1,7 +1,7 @@
 import os
 import sys
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import numpy as np
 import torch
@@ -12,21 +12,20 @@ from torch.utils.data import DataLoader, random_split
 from mytime import time_change
 import time
 
-from torchvision.models import squeezenet1_0
+from torchvision.models import resnet50
 from torchvision.transforms import transforms
 from torchvision.datasets import ImageFolder
 
 if __name__ == '__main__':
     TRAIN_DATA_PATH = 'dataset/newtrain/'
     TRAIN_LABEL_PATH = 'dataset/train.csv'
-    TRAIN_DATA_RATIO = 0.95
-    LEARNING_RATE = 1e-5
-    EPOCHS = 100
+    TRAIN_DATA_RATIO = 0.9
+    LEARNING_RATE = 1e-6
+    EPOCHS = 10
     PRINT_EPOCH = 1
-    VALID_EPOCH = 10
-    SAVE_EPOCH = 10
-    DOWNLR_EPOCH = 20
-    BATCH_SIZE = 16
+    VALID_EPOCH = 1
+    SAVE_EPOCH = 1
+    BATCH_SIZE=16
 
     # set transformer
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -47,7 +46,8 @@ if __name__ == '__main__':
     valid_loader = DataLoader(dataset=vaild_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     # init model
-    model = nn.Sequential(squeezenet1_0(pretrained=True),nn.Linear(1000, 3), nn.Softmax())
+    model = nn.Sequential(resnet50(pretrained=True),nn.Linear(1000, 3), nn.Softmax())
+    model.load_state_dict(torch.load('model/0309_resnet_final01.pth'))
     model.train()
     model.cuda()
 
@@ -119,9 +119,4 @@ if __name__ == '__main__':
 
         # save_model
         if epoch_idx % SAVE_EPOCH == 0:
-            torch.save(model.state_dict(), 'model/0309_squeezenet_{}.pth'.format(epoch_idx))
-
-        #
-        if epoch_idx % DOWNLR_EPOCH == 0:
-            LEARNING_RATE = LEARNING_RATE / 10
-            optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+            torch.save(model.state_dict(), 'model/0309_resnet_b_{}.pth'.format(epoch_idx))
